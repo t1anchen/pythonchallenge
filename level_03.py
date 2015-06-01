@@ -10,7 +10,8 @@ logging.basicConfig(format='%(message)s')
 
 
 def solution(data):
-    return filter(lambda x: x in string.letters, data)
+    pattern = r'[^A-Z][A-Z]{3}[a-z][A-Z]{3}[^A-Z]'
+    return ''.join(x[4] for x in re.findall(pattern, data))
 
 
 class SolutionTest(unittest.TestCase):
@@ -18,13 +19,12 @@ class SolutionTest(unittest.TestCase):
     def setUp(self):
         self.prefix = "http://www.pythonchallenge.com/pc/def/"
         self.suffix = ".html"
-        self.src_url = "http://www.pythonchallenge.com/pc/def/ocr.html"
+        self.src_url = "http://www.pythonchallenge.com/pc/def/equality.html"
 
     def test_solution(self):
-        actual = ''
         r = requests.get(self.src_url)
-        actual = solution(re.findall('<!--[^>]*-->', r.text)[1])
-        expected = 'equality'
+        actual = solution(''.join(re.findall('<!--[^>]*-->', r.text)))
+        expected = 'linkedlist'
         self.assertEquals(actual, expected)
         r.close()
         origin_url = ''.join([self.prefix, actual, self.suffix])
@@ -39,9 +39,9 @@ class SolutionTest(unittest.TestCase):
         if len(next_entry) != 0:
             r = requests.get(
                 ''.join([self.prefix, next_entry[0], self.suffix]))
-            logging.warn('Level 03 is %s' % r.url)
+            logging.warn('Level 04 is %s' % r.url)
         else:
-            logging.warn('Level 03 is %s' % origin_url)
+            logging.warn('Level 04 is %s' % origin_url)
 
 
 if __name__ == "__main__":

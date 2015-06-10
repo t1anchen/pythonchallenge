@@ -53,7 +53,7 @@ class SolutionTest(unittest.TestCase):
  **************************************************************
 '''
         self.assertEquals(actual, expected)
-        origin_url = ''.join([self.prefix, 'hockey', self.suffix])
+        origin_url = ''.join([self.prefix, 'oxygen', self.suffix])  # Trick: hockey is consist of letters of oxygen
         try:
             r = requests.get(origin_url)
         except:

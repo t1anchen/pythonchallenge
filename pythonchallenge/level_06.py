@@ -2,7 +2,8 @@ import unittest
 import requests
 import logging
 import re
-import pickle
+import zipfile
+import urllib
 
 
 # Default is warning, it's to suppress requests INFO log
@@ -10,15 +11,21 @@ logging.basicConfig(format='%(message)s')
 
 
 def solution():
-    url = "http://www.pythonchallenge.com/pc/def/banner.p"
-    banner = pickle.loads(requests.get(url).text)
-    ret = []
-    for g in banner:
-        line = ''
-        for c, count_c in g:
-            line += c * count_c
-        ret.append(line)
-    return ret
+    url = "http://www.pythonchallenge.com/pc/def/channel.zip"
+    urllib.urlretrieve(url, "/tmp/channel.zip")
+    zip_file = zipfile.ZipFile("/tmp/channel.zip")
+    zip_file_comments = []
+    member_name = "90052.txt"
+    while True:
+        zip_info = zip_file.getinfo(member_name)
+        with zip_file.open(member_name) as member_stream:
+            number = re.findall(r'\d+$', member_stream.read())
+        zip_file_comments.append(zip_info.comment)
+        if number:
+            member_name = '%s.txt' % number[0]
+        else:
+            break
+    return ''.join(zip_file_comments)
 
 
 class SolutionTest(unittest.TestCase):
@@ -30,31 +37,23 @@ class SolutionTest(unittest.TestCase):
     def test_solution(self):
         actual = solution()
         # It would be identified by pep8, but this is ascii art, who cares!
-        expected = ['                                                                                               ',
- '              #####                                                                      ##### ',
- '               ####                                                                       #### ',
- '               ####                                                                       #### ',
- '               ####                                                                       #### ',
- '               ####                                                                       #### ',
- '               ####                                                                       #### ',
- '               ####                                                                       #### ',
- '               ####                                                                       #### ',
- '      ###      ####   ###         ###       #####   ###    #####   ###          ###       #### ',
- '   ###   ##    #### #######     ##  ###      #### #######   #### #######     ###  ###     #### ',
- '  ###     ###  #####    ####   ###   ####    #####    ####  #####    ####   ###     ###   #### ',
- ' ###           ####     ####   ###    ###    ####     ####  ####     ####  ###      ####  #### ',
- ' ###           ####     ####          ###    ####     ####  ####     ####  ###       ###  #### ',
- '####           ####     ####     ##   ###    ####     ####  ####     #### ####       ###  #### ',
- '####           ####     ####   ##########    ####     ####  ####     #### ##############  #### ',
- '####           ####     ####  ###    ####    ####     ####  ####     #### ####            #### ',
- '####           ####     #### ####     ###    ####     ####  ####     #### ####            #### ',
- ' ###           ####     #### ####     ###    ####     ####  ####     ####  ###            #### ',
- '  ###      ##  ####     ####  ###    ####    ####     ####  ####     ####   ###      ##   #### ',
- '   ###    ##   ####     ####   ###########   ####     ####  ####     ####    ###    ##    #### ',
- '      ###     ######    #####    ##    #### ######    ###########    #####      ###      ######',
- '                                                                                               ']
+        expected = '''****************************************************************
+****************************************************************
+**                                                            **
+**   OO    OO    XX      YYYY    GG    GG  EEEEEE NN      NN  **
+**   OO    OO  XXXXXX   YYYYYY   GG   GG   EEEEEE  NN    NN   **
+**   OO    OO XXX  XXX YYY   YY  GG GG     EE       NN  NN    **
+**   OOOOOOOO XX    XX YY        GGG       EEEEE     NNNN     **
+**   OOOOOOOO XX    XX YY        GGG       EEEEE      NN      **
+**   OO    OO XXX  XXX YYY   YY  GG GG     EE         NN      **
+**   OO    OO  XXXXXX   YYYYYY   GG   GG   EEEEEE     NN      **
+**   OO    OO    XX      YYYY    GG    GG  EEEEEE     NN      **
+**                                                            **
+****************************************************************
+ **************************************************************
+'''
         self.assertEquals(actual, expected)
-        origin_url = ''.join([self.prefix, 'channel', self.suffix])
+        origin_url = ''.join([self.prefix, 'hockey', self.suffix])
         try:
             r = requests.get(origin_url)
         except:

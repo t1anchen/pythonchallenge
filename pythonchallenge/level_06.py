@@ -4,6 +4,8 @@ import logging
 import re
 import zipfile
 import urllib
+import os
+import os.path
 
 
 # Default is warning, it's to suppress requests INFO log
@@ -12,8 +14,8 @@ logging.basicConfig(format='%(message)s')
 
 def solution():
     url = "http://www.pythonchallenge.com/pc/def/channel.zip"
-    urllib.urlretrieve(url, "/tmp/channel.zip")
-    zip_file = zipfile.ZipFile("/tmp/channel.zip")
+    urllib.urlretrieve(url, "channel.zip")
+    zip_file = zipfile.ZipFile("channel.zip")
     zip_file_comments = []
     member_name = "90052.txt"
     while True:
@@ -34,6 +36,11 @@ class SolutionTest(unittest.TestCase):
         self.prefix = "http://www.pythonchallenge.com/pc/def/"
         self.suffix = ".html"
 
+    def tearDown(self):
+        zip_path = "channel.zip"
+        if os.path.exists(zip_path):
+            os.remove(zip_path)
+
     def test_solution(self):
         actual = solution()
         # It would be identified by pep8, but this is ascii art, who cares!
@@ -53,7 +60,8 @@ class SolutionTest(unittest.TestCase):
  **************************************************************
 '''
         self.assertEquals(actual, expected)
-        origin_url = ''.join([self.prefix, 'oxygen', self.suffix])  # Trick: hockey is consist of letters of oxygen
+        # Trick: hockey is consist of letters of oxygen
+        origin_url = ''.join([self.prefix, 'oxygen', self.suffix])
         try:
             r = requests.get(origin_url)
         except:

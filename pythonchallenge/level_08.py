@@ -42,9 +42,9 @@ class SolutionTest(unittest.TestCase):
         if len(next_entry) != 0:
             r = requests.get(
                 ''.join([self.prefix, next_entry[0], self.suffix], auth=expected))
-            logging.warn('Level 06 is %s with %s' % (r.url, expected))
+            logging.warn('Level 09 is %s with %s' % (r.url, expected))
         else:
-            logging.warn('Level 06 is %s with %s' % (origin_url, expected))
+            logging.warn('Level 09 is %s with %s' % (origin_url, expected))
 
 
 if __name__ == "__main__":

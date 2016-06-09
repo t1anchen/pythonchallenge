@@ -4,6 +4,7 @@ from nose.tools import nottest
 import pc.level_00
 import pc.level_01
 import pc.level_12
+import pc.level_13
 
 def_template = 'http://www.pythonchallenge.com/pc/def/{0}.html'
 pc_return_tmpl = 'http://www.pythonchallenge.com/pc/return/{0}'
@@ -47,3 +48,8 @@ def test_level_12():
     expected = 'disproportional'
     assert expected == actual
     pc.level_12.clean()
+
+def test_level_13():
+    actual = pc.level_13.solution()
+    expected = 'ITALY'
+    assert expected == actual

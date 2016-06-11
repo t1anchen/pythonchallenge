@@ -1,3 +1,6 @@
+'''Level 12: Evil
+'''
+
 import requests
 from itertools import cycle
 import os
@@ -23,7 +26,7 @@ def solution():
     # img01.gfx -> pro
     # img02.gfx -> port
     # img03.gfx -> ional
-    # img04.gfx -> i̶t̶y̶ (abandoned, strikethrough combining U+0336)
+    # img04.gfx -> i̶t̶y̶ (abandoned, strikethrough combining U+0336) # if python2, add coding utf8 ahead of this file
 
     return 'disproportional'
 

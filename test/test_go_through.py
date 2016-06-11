@@ -22,7 +22,6 @@ def test_level_00():
     expected = 'map'
     assert actual == expected
 
-@nottest
 def test_level_01():
     template = def_template
     test_data = '''g fmnc wms bgblr rpylqjyrc gr zw fylb. ''' + \

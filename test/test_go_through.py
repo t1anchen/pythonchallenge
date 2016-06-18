@@ -6,6 +6,7 @@ import pc.level_01
 import pc.level_12
 import pc.level_13
 import pc.level_14
+import pc.level_15
 
 def_template = 'http://www.pythonchallenge.com/pc/def/{0}.html'
 pc_return_tmpl = 'http://www.pythonchallenge.com/pc/return/{0}'
@@ -57,4 +58,9 @@ def test_level_13():
 def test_level_14():
     actual = pc.level_14.solution()
     expected = 'cat'
+    assert expected == actual
+
+def test_level_15():
+    actual = pc.level_15.solution()
+    expected = 'mozart'
     assert expected == actual

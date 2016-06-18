@@ -64,3 +64,8 @@ def test_level_15():
     actual = pc.level_15.solution()
     expected = 'mozart'
     assert expected == actual
+
+def test_level_16():
+    actual = pc.level_16.solution()
+    expected = 'romance'
+    assert expected == actual

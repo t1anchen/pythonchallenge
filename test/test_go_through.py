@@ -7,6 +7,7 @@ import pc.level_12
 import pc.level_13
 import pc.level_14
 import pc.level_15
+import pc.level_16
 
 def_template = 'http://www.pythonchallenge.com/pc/def/{0}.html'
 pc_return_tmpl = 'http://www.pythonchallenge.com/pc/return/{0}'

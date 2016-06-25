@@ -3,11 +3,13 @@ import requests
 from nose.tools import nottest
 import pc.level_00
 import pc.level_01
+import pc.level_04
 import pc.level_12
 import pc.level_13
 import pc.level_14
 import pc.level_15
 import pc.level_16
+import pc.level_17
 
 def_template = 'http://www.pythonchallenge.com/pc/def/{0}.html'
 pc_return_tmpl = 'http://www.pythonchallenge.com/pc/return/{0}'
@@ -45,6 +47,11 @@ def test_level_01():
     expected = 'ocr'
     assert expected == actual
 
+def test_level_04():
+    actual = pc.level_04.solution()
+    expected = 'peak'
+    assert expected == actual
+
 def test_level_12():
     actual = pc.level_12.solution()
     expected = 'disproportional'
@@ -69,4 +76,9 @@ def test_level_15():
 def test_level_16():
     actual = pc.level_16.solution()
     expected = 'romance'
+    assert expected == actual
+
+def test_level_17():
+    actual = pc.level_17.solution()
+    expected = 'balloons'
     assert expected == actual

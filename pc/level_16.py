@@ -7,7 +7,8 @@ import requests
 from io import BytesIO # use cStringIO.StringIO if python2
 
 def solution():
-    '''Twist line into square
+    '''Get pink segments into straight
+    GIF image uses Palettes for colors (https://en.wikipedia.org/wiki/GIF#Palettes)
     '''
     PURPLE_CODE = 195
     res = requests.get('http://www.pythonchallenge.com/pc/return/mozart.gif', auth=('huge', 'file'))

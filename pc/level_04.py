@@ -1,72 +1,19 @@
-import unittest
 import requests
-import logging
 import re
-import string
+from collections import deque
 
-
-# Default is warning, it's to suppress requests INFO log
-logging.basicConfig(format='%(message)s')
-
-
-def next_n(prefix, n):
-    url_prefix = ''.join([prefix, "linkedlist.php?nothing="])
-    addr = ''.join([url_prefix, n])
-    logging.warn(addr)
-    r = requests.get(addr)
-    logging.warn(r.text)
-    ns = re.findall('[0-9]+', r.text)
-    ret = ''
-    if re.search('[Dd]ivide', r.text):
-        ret = str(int(n)/2)
-    elif len(ns) > 1:
-        ret = ns[-1]
-    elif len(ns) > 0:
-        ret = ns[0]
-    elif re.search('html', r.text):
-        ret = re.sub(r'(.+)\.html', r'\1', r.text)
-    r.close()
-    return ret
-
-
-def solution(prefix, n_0):
-    n = n_0
-    while True:
-        n = next_n(prefix, n)
-        try:
-            int(n)
-        except:
-            break
-    return n
-
-
-class SolutionTest(unittest.TestCase):
-
-    def setUp(self):
-        self.prefix = "http://www.pythonchallenge.com/pc/def/"
-        self.suffix = ".html"
-        self.src_url = "http://www.pythonchallenge.com/pc/def/equality.html"
-
-    def test_solution(self):
-        actual = solution(self.prefix, '12345')
-        expected = 'peak'
-        self.assertEquals(actual, expected)
-        origin_url = ''.join([self.prefix, actual, self.suffix])
-        try:
-            r = requests.get(origin_url)
-        except:
-            raise
-        self.assertTrue(r.ok)
-        next_entry = [re.sub(r'(.*)URL=(.*)\.html\"\>', r'\2', line)
-                      for line in r.iter_lines() if re.match(r'.*URL.*', line)]
-        r.close()
-        if len(next_entry) != 0:
-            r = requests.get(
-                ''.join([self.prefix, next_entry[0], self.suffix]))
-            logging.warn('Level 05 is %s' % r.url)
-        else:
-            logging.warn('Level 05 is %s' % origin_url)
-
-
-if __name__ == "__main__":
-    unittest.main(failfast=True)
+def solution():
+    url = 'http://www.pythonchallenge.com/pc/def/linkedlist.php'
+    n = '12345'
+    while len(re.findall('\d+', n)) > 0:
+        res = requests.get(url, params={'nothing': n})
+        numbers = re.findall('\d+', res.text)
+        if re.search('[Dd]ivide', res.text):
+            n = str(int(n) // 2)
+        elif len(numbers) > 1:
+            n = deque(numbers, maxlen=1).pop()
+        elif len(numbers) > 0:
+            n = numbers[0]
+        elif re.search('html', res.text):
+            n = re.sub(r'(.+)\.html', r'\1', res.text)
+    return n # 'peak'

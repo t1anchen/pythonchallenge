@@ -6,6 +6,7 @@ import requests
 import re
 from collections import deque
 from urllib.parse import unquote_to_bytes
+import bz2
 
 def solution():
     '''

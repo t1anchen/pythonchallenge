@@ -6,6 +6,7 @@ def solution():
     url = 'http://www.pythonchallenge.com/pc/def/linkedlist.php'
     n = '12345'
     while len(re.findall('\d+', n)) > 0:
+        print(n)
         res = requests.get(url, params={'nothing': n})
         numbers = re.findall('\d+', res.text)
         if re.search('[Dd]ivide', res.text):

@@ -5,7 +5,7 @@ from pathlib import Path
 
 import requests
 
-from pc import def_template
+from pc import def_page_template
 from pc.level_02 import solution
 
 
@@ -21,7 +21,7 @@ def test_unit():
 
 def test_integration():
     expected = "equality"
-    url = def_template.format("ocr")
+    url = def_page_template.format("ocr")
     logging.debug(f"Visiting {url}")
     resp = requests.get(url)
     matched = re.findall(r"<!--([^>]*)-->", resp.text)

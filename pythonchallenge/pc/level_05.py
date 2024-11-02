@@ -1,79 +1,38 @@
+import asyncio
 import logging
 import pickle
-import re
-import unittest
 
-import requests
+import aiohttp
+from bs4 import BeautifulSoup
 
-# Default is warning, it's to suppress requests INFO log
-logging.basicConfig(format="%(message)s")
+from . import def_page_template, def_template
 
 
-def solution():
-    url = "http://www.pythonchallenge.com/pc/def/banner.p"
-    banner = pickle.loads(requests.get(url).text)
-    ret = []
-    for g in banner:
-        line = ""
-        for c, count_c in g:
-            line += c * count_c
-        ret.append(line)
-    return ret
+async def fetch_from_remote():
+    async with aiohttp.ClientSession() as session:
+        url = def_page_template.format("peak")
+        logging.debug(f"Visiting {url}")
+        async with session.get(url) as resp:
+            html_page = await resp.text("utf_8")
+        parser = BeautifulSoup(html_page, "html.parser")
+        peakhell_tag = parser.find("peakhell")
+        assert peakhell_tag is not None
+        assert "src" in peakhell_tag.attrs
+        pickle_file = peakhell_tag["src"]
+        logging.debug(f"Found {pickle_file}")
+        download_url = def_template.format(pickle_file)
+        logging.debug(f"Downloading {download_url}")
+        async with session.get(download_url) as resp:
+            pickle_file_data = await resp.read()
+        return pickle_file_data
 
 
-class SolutionTest(unittest.TestCase):
-
-    def setUp(self):
-        self.prefix = "http://www.pythonchallenge.com/pc/def/"
-        self.suffix = ".html"
-
-    def test_solution(self):
-        actual = solution()
-        # It would be identified by pep8, but this is ascii art, who cares!
-        expected = [
-            "                                                                                               ",
-            "              #####                                                                      ##### ",
-            "               ####                                                                       #### ",
-            "               ####                                                                       #### ",
-            "               ####                                                                       #### ",
-            "               ####                                                                       #### ",
-            "               ####                                                                       #### ",
-            "               ####                                                                       #### ",
-            "               ####                                                                       #### ",
-            "      ###      ####   ###         ###       #####   ###    #####   ###          ###       #### ",
-            "   ###   ##    #### #######     ##  ###      #### #######   #### #######     ###  ###     #### ",
-            "  ###     ###  #####    ####   ###   ####    #####    ####  #####    ####   ###     ###   #### ",
-            " ###           ####     ####   ###    ###    ####     ####  ####     ####  ###      ####  #### ",
-            " ###           ####     ####          ###    ####     ####  ####     ####  ###       ###  #### ",
-            "####           ####     ####     ##   ###    ####     ####  ####     #### ####       ###  #### ",
-            "####           ####     ####   ##########    ####     ####  ####     #### ##############  #### ",
-            "####           ####     ####  ###    ####    ####     ####  ####     #### ####            #### ",
-            "####           ####     #### ####     ###    ####     ####  ####     #### ####            #### ",
-            " ###           ####     #### ####     ###    ####     ####  ####     ####  ###            #### ",
-            "  ###      ##  ####     ####  ###    ####    ####     ####  ####     ####   ###      ##   #### ",
-            "   ###    ##   ####     ####   ###########   ####     ####  ####     ####    ###    ##    #### ",
-            "      ###     ######    #####    ##    #### ######    ###########    #####      ###      ######",
-            "                                                                                               ",
-        ]
-        self.assertEquals(actual, expected)
-        origin_url = "".join([self.prefix, "channel", self.suffix])
-        try:
-            r = requests.get(origin_url)
-        except:
-            raise
-        self.assertTrue(r.ok)
-        next_entry = [
-            re.sub(r"(.*)URL=(.*)\.html\"\>", r"\2", line)
-            for line in r.iter_lines()
-            if re.match(r".*URL.*", line)
-        ]
-        r.close()
-        if len(next_entry) != 0:
-            r = requests.get("".join([self.prefix, next_entry[0], self.suffix]))
-            logging.warn("Level 06 is %s" % r.url)
-        else:
-            logging.warn("Level 06 is %s" % origin_url)
-
-
-if __name__ == "__main__":
-    unittest.main(failfast=True)
+def solution(data: bytes):
+    if data is None:
+        data = asyncio.run(fetch_from_remote())
+    banner = pickle.loads(data)
+    # logging.debug(f"{banner=}")
+    ans = []
+    for group in banner:
+        ans.append("".join(c * n_c for c, n_c in group))
+    return ans  # channel

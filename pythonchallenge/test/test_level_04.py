@@ -1,7 +1,7 @@
 from pc.level_04 import solution
 
 
-def test_level_04():
+def test_integration():
     actual = solution()
     expected = "peak"
     assert expected == actual

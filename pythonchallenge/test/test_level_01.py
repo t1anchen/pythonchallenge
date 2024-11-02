@@ -1,6 +1,9 @@
-from pc.level_01 import decrypt, solution
 import logging
+
 import requests
+
+from pc.level_01 import decrypt, solution
+
 from . import def_template
 
 

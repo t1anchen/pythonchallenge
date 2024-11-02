@@ -1,9 +1,9 @@
-import unittest
-import requests
 import logging
-import re
 import pickle
+import re
+import unittest
 
+import requests
 
 # Default is warning, it's to suppress requests INFO log
 logging.basicConfig(format="%(message)s")

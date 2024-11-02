@@ -1,12 +1,12 @@
-import unittest
-import requests
 import logging
-import re
-import zipfile
-import urllib
 import os
 import os.path
+import re
+import unittest
+import urllib
+import zipfile
 
+import requests
 
 # Default is warning, it's to suppress requests INFO log
 logging.basicConfig(format="%(message)s")

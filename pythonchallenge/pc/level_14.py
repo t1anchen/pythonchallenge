@@ -1,10 +1,11 @@
 """Level 14: ITALY
 """
 
-from PIL import Image
-import requests
 from io import BytesIO  # use cStringIO.StringIO if python2
 from itertools import cycle
+
+import requests
+from PIL import Image
 
 
 def solution():

@@ -3,9 +3,8 @@ import logging
 import pytest
 import requests
 
+from pc import def_template
 from pc.level_00 import solution
-
-from . import def_template
 
 actual = pytest.fixture(solution)
 

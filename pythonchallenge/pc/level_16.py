@@ -1,10 +1,10 @@
 """Level 16: Mozart
 """
 
-from PIL import Image
-from PIL import ImageChops
-import requests
 from io import BytesIO  # use cStringIO.StringIO if python2
+
+import requests
+from PIL import Image, ImageChops
 
 
 def solution():

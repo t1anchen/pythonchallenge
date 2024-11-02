@@ -1,9 +1,10 @@
 """Level 12: Evil
 """
 
-import requests
-from itertools import cycle
 import os
+from itertools import cycle
+
+import requests
 
 
 def solution():

@@ -2,11 +2,12 @@
 http://www.pythonchallenge.com/pc/return/romance.html
 """
 
-import requests
+import bz2
 import re
 from collections import deque
 from urllib.parse import unquote_to_bytes
-import bz2
+
+import requests
 
 
 def solution():
@@ -25,9 +26,9 @@ def solution():
     prefix = "http://www.pythonchallenge.com/pc/def/linkedlist.php"
     cookies = []
     with requests.Session() as s:
-        while len(re.findall("\d+", n)) > 0:
+        while len(re.findall(r"\d+", n)) > 0:
             res = s.get(prefix, params={"busynothing": n})
-            numbers = re.findall("\d+", res.text)
+            numbers = re.findall(r"\d+", res.text)
             print(res.text, numbers)
             n = next(iter(deque(numbers, maxlen=1)), "")
             cookies += s.cookies.values()

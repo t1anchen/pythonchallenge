@@ -5,9 +5,8 @@ from pathlib import Path
 
 import requests
 
+from pc import def_template
 from pc.level_03 import solution
-
-from . import def_template
 
 
 def test_unit():

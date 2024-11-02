@@ -1,13 +1,13 @@
-import unittest
-import urllib
-import requests
 import logging
-import re
-import urllib
 import os
 import os.path
+import re
+import unittest
+import urllib
+
 import Image
 import ImageDraw
+import requests
 from StringIO import StringIO
 
 # Default is warning, it's to suppress requests INFO log

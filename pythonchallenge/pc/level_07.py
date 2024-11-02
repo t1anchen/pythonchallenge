@@ -1,11 +1,12 @@
-import unittest
-import requests
 import logging
-import re
-import urllib
 import os
 import os.path
+import re
+import unittest
+import urllib
+
 import Image  # requires PIL or Pillow
+import requests
 
 # Default is warning, it's to suppress requests INFO log
 logging.basicConfig(format="%(message)s")

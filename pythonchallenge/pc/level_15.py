@@ -5,9 +5,10 @@ http://www.pythonchallenge.com/pc/return/uzi.html
 It seems like guessing a person
 """
 
-import requests
 import calendar
 from datetime import date
+
+import requests
 
 
 def solution():

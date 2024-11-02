@@ -3,9 +3,8 @@ import logging
 import pytest
 import requests
 
+from pc import def_template
 from pc.level_01 import decrypt, solution
-
-from . import def_template
 
 
 def test_decrypt():

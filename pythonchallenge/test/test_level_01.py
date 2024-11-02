@@ -1,5 +1,6 @@
 import logging
 
+import pytest
 import requests
 
 from pc.level_01 import decrypt, solution
@@ -28,10 +29,15 @@ def test_decrypt():
     assert expected == actual
 
 
-def test_solution():
-    actual = solution()
+actual = pytest.fixture(solution)
+
+
+def test_unit(actual):
     expected = "ocr"
     assert expected == actual
+
+
+def test_integration(actual):
     url = def_template.format(actual)
     logging.debug(f"Visiting {url}")
     resp = requests.get(url)

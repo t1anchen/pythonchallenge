@@ -37,12 +37,6 @@ pc_return_tmpl = "http://www.pythonchallenge.com/pc/return/{0}"
 #     assert actual == expected
 
 
-
-
-
-
-
-
 def test_level_12():
     actual = pc.level_12.solution()
     expected = "disproportional"

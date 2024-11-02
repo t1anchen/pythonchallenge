@@ -9,7 +9,7 @@ import os.path
 
 
 # Default is warning, it's to suppress requests INFO log
-logging.basicConfig(format='%(message)s')
+logging.basicConfig(format="%(message)s")
 
 
 def solution():
@@ -21,13 +21,13 @@ def solution():
     while True:
         zip_info = zip_file.getinfo(member_name)
         with zip_file.open(member_name) as member_stream:
-            number = re.findall(r'\d+$', member_stream.read())
+            number = re.findall(r"\d+$", member_stream.read())
         zip_file_comments.append(zip_info.comment)
         if number:
-            member_name = '%s.txt' % number[0]
+            member_name = "%s.txt" % number[0]
         else:
             break
-    return ''.join(zip_file_comments)
+    return "".join(zip_file_comments)
 
 
 class SolutionTest(unittest.TestCase):
@@ -44,7 +44,7 @@ class SolutionTest(unittest.TestCase):
     def test_solution(self):
         actual = solution()
         # It would be identified by pep8, but this is ascii art, who cares!
-        expected = '''****************************************************************
+        expected = """****************************************************************
 ****************************************************************
 **                                                            **
 **   OO    OO    XX      YYYY    GG    GG  EEEEEE NN      NN  **
@@ -58,24 +58,26 @@ class SolutionTest(unittest.TestCase):
 **                                                            **
 ****************************************************************
  **************************************************************
-'''
+"""
         self.assertEquals(actual, expected)
         # Trick: hockey is consist of letters of oxygen
-        origin_url = ''.join([self.prefix, 'oxygen', self.suffix])
+        origin_url = "".join([self.prefix, "oxygen", self.suffix])
         try:
             r = requests.get(origin_url)
         except:
             raise
         self.assertTrue(r.ok)
-        next_entry = [re.sub(r'(.*)URL=(.*)\.html\"\>', r'\2', line)
-                      for line in r.iter_lines() if re.match(r'.*URL.*', line)]
+        next_entry = [
+            re.sub(r"(.*)URL=(.*)\.html\"\>", r"\2", line)
+            for line in r.iter_lines()
+            if re.match(r".*URL.*", line)
+        ]
         r.close()
         if len(next_entry) != 0:
-            r = requests.get(
-                ''.join([self.prefix, next_entry[0], self.suffix]))
-            logging.warn('Level 07 is %s' % r.url)
+            r = requests.get("".join([self.prefix, next_entry[0], self.suffix]))
+            logging.warn("Level 07 is %s" % r.url)
         else:
-            logging.warn('Level 07 is %s' % origin_url)
+            logging.warn("Level 07 is %s" % origin_url)
 
 
 if __name__ == "__main__":

@@ -1,4 +1,4 @@
-\[
+$$
 \begin{align}
 t &= (100 * 100 - 1) - t \\
 shell &= \left\lfloor\frac{\sqrt{t}+1}{2}\right\rfloor \\
@@ -8,4 +8,4 @@ leg &= \begin{cases}
 \end{cases} \\
 elt &= t - (2 * shell - 1)^2 - 2 * shell * leg - shell + 1
 \end{align}
-\]
+$$

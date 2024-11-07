@@ -69,3 +69,10 @@ def solution(data: bytes):
         logging.debug(line)
 
     return total_comments  # hockey
+
+    # [2024-11-07T23:44:45+08:00] Aftre visiting
+    # http://www.pythonchallenge.com/pc/def/hockey.html, it prompts "it's in the
+    # air. look at the letters. ". Go back the comments, it founds the ascii art
+    # diagrams consist of "oxygen" letters.
+
+    # final jump to http://www.pythonchallenge.com/pc/def/oxygen.html

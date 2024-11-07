@@ -1,62 +1,42 @@
+import asyncio
 import logging
-import os
-import os.path
 import re
-import unittest
-import urllib
+from io import BytesIO
 
-import Image  # requires PIL or Pillow
-import requests
+import aiohttp
+from bs4 import BeautifulSoup
+from PIL import Image
 
-# Default is warning, it's to suppress requests INFO log
-logging.basicConfig(format="%(message)s")
-
-
-def solution():
-    url = "http://www.pythonchallenge.com/pc/def/oxygen.png"
-    urllib.urlretrieve(url, "oxygen.png")
-    image_file = Image.open("oxygen.png")
-    the_grey_panel = [image_file.getpixel((i, 43))[0] for i in xrange(0, 609, 7)]
-    hint = "".join(map(chr, the_grey_panel))
-    logging.warn(hint)
-    return "".join(map(lambda x: chr(int(x)), re.findall(r"\d{3}", hint)))
+from . import def_page_template, def_template
 
 
-class SolutionTest(unittest.TestCase):
-
-    def setUp(self):
-        self.prefix = "http://www.pythonchallenge.com/pc/def/"
-        self.suffix = ".html"
-
-    def tearDown(self):
-        zip_path = "oxygen.png"
-        if os.path.exists(zip_path):
-            os.remove(zip_path)
-
-    def test_solution(self):
-        actual = solution()
-        # It would be identified by pep8, but this is ascii art, who cares!
-        expected = "integrity"
-        self.assertEquals(actual, expected)
-        # Trick: hockey is consist of letters of oxygen
-        origin_url = "".join([self.prefix, "integrity", self.suffix])
-        try:
-            r = requests.get(origin_url)
-        except:
-            raise
-        self.assertTrue(r.ok)
-        next_entry = [
-            re.sub(r"(.*)URL=(.*)\.html\"\>", r"\2", line)
-            for line in r.iter_lines()
-            if re.match(r".*URL.*", line)
-        ]
-        r.close()
-        if len(next_entry) != 0:
-            r = requests.get("".join([self.prefix, next_entry[0], self.suffix]))
-            logging.warn("Level 08 is %s" % r.url)
-        else:
-            logging.warn("Level 08 is %s" % origin_url)
+async def fetch_from_remote():
+    url = def_page_template.format("oxygen")
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url) as resp:
+            html_page = await resp.text("utf_8")
+        parser = BeautifulSoup(html_page, "html.parser")
+        logging.debug(f"{parser.find("body")=}")
+        img_tag = parser.find("img")
+        assert "src" in img_tag.attrs
+        url = def_template.format(img_tag["src"])
+        async with session.get(url) as resp:
+            img_data = await resp.read()
+        return img_data
 
 
-if __name__ == "__main__":
-    unittest.main(failfast=True)
+def solution(data: bytes):
+    if data is None:
+        data = asyncio.run(fetch_from_remote())
+    img = Image.open(BytesIO(data))
+    logging.debug(f"Reading image {img.size}")
+    grey_line = [img.getpixel((x, img.height / 2)) for x in range(img.width)]
+    unique_pixels_at_line = grey_line[::7]
+    ords = [r for r, g, b, a in unique_pixels_at_line if r == g == b]
+    hint = "".join(map(chr, ords))
+    logging.debug(f"{hint=}")
+    # smart guy, you made it. the next level is [105, 110, 116, 101, 103, 114, 105, 116, 121]
+    nums = re.findall(r"\d+", hint)
+    ans = "".join(map(chr, map(int, nums)))
+    logging.debug(f"{ans=}")
+    return ans  # integrity

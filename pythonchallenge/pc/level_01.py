@@ -13,3 +13,4 @@ def decrypt(cipher: str) -> str:
 
 def solution():
     return decrypt("map")
+    # ocr

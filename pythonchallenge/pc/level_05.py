@@ -35,4 +35,6 @@ def solution(data: bytes):
     ans = []
     for group in banner:
         ans.append("".join(c * n_c for c, n_c in group))
+    for line in ans:
+        logging.debug(line)
     return ans  # channel

@@ -1,84 +1,71 @@
+import asyncio
 import logging
-import os
-import os.path
 import re
-import unittest
-import urllib
 import zipfile
+from io import BytesIO
 
-import requests
+import aiohttp
 
-# Default is warning, it's to suppress requests INFO log
-logging.basicConfig(format="%(message)s")
+from . import def_page_template, def_template
 
 
-def solution():
-    url = "http://www.pythonchallenge.com/pc/def/channel.zip"
-    urllib.urlretrieve(url, "channel.zip")
-    zip_file = zipfile.ZipFile("channel.zip")
-    zip_file_comments = []
-    member_name = "90052.txt"
+async def get_hint():
+    async with aiohttp.ClientSession() as session:
+        url = def_page_template.format("channel")
+        logging.debug(f"Visiting {url}")
+        async with session.get(url) as resp:
+            html_page = await resp.text("utf_8")
+        hint = "".join(re.findall(r"<!-- <-- (.+) -->", html_page))
+        logging.debug(f"{hint=}")
+        return hint
+
+
+async def fetch_from_remote():
+    hint = await get_hint()
+    async with aiohttp.ClientSession() as session:
+        url = def_template.format(".".join(["channel", hint]))
+        logging.debug(f"Visiting {url}")
+        async with session.get(url) as resp:
+            zip_file_data = await resp.read()
+        return zip_file_data
+
+
+def solution(data: bytes):
+    if data is None:
+        data = asyncio.run(fetch_from_remote())
+    zip_file = zipfile.ZipFile(BytesIO(data))
+    n_member = 0
+    member_stat = {}
+    for fi in zip_file.filelist:
+        member_stat[fi.filename] = 0
+        # logging.debug(f"{fi=}")
+        n_member += 1
+    logging.debug(f"{n_member=}")
+    with zip_file.open("readme.txt") as stream:
+        logging.debug(stream.read().decode())
+
+    comments_from_zip = []
+
+    member = "90052.txt"  # start member
+    n_jump = 0
     while True:
-        zip_info = zip_file.getinfo(member_name)
-        with zip_file.open(member_name) as member_stream:
-            number = re.findall(r"\d+$", member_stream.read())
-        zip_file_comments.append(zip_info.comment)
-        if number:
-            member_name = "%s.txt" % number[0]
+        logging.debug(f"{n_jump=} Reading {member}")
+        zip_info = zip_file.getinfo(member)
+        member_stat[member] += 1
+        with zip_file.open(member) as member_stream:
+            next_number = "".join(re.findall(r"\d+$", member_stream.read().decode()))
+        comments_from_zip.append(zip_info.comment)
+        if next_number:
+            member = f"{next_number}.txt"
+            n_jump += 1
         else:
             break
-    return "".join(zip_file_comments)
 
+    # [2024-11-07T23:22:49+08:00] from member_stat, it reveals that every files
+    # in the package except readme.txt will be visited.
 
-class SolutionTest(unittest.TestCase):
+    total_comments = (b"".join(comments_from_zip)).decode().split("\n")
+    for line in total_comments:
+        logging.debug(line)
 
-    def setUp(self):
-        self.prefix = "http://www.pythonchallenge.com/pc/def/"
-        self.suffix = ".html"
-
-    def tearDown(self):
-        zip_path = "channel.zip"
-        if os.path.exists(zip_path):
-            os.remove(zip_path)
-
-    def test_solution(self):
-        actual = solution()
-        # It would be identified by pep8, but this is ascii art, who cares!
-        expected = """****************************************************************
-****************************************************************
-**                                                            **
-**   OO    OO    XX      YYYY    GG    GG  EEEEEE NN      NN  **
-**   OO    OO  XXXXXX   YYYYYY   GG   GG   EEEEEE  NN    NN   **
-**   OO    OO XXX  XXX YYY   YY  GG GG     EE       NN  NN    **
-**   OOOOOOOO XX    XX YY        GGG       EEEEE     NNNN     **
-**   OOOOOOOO XX    XX YY        GGG       EEEEE      NN      **
-**   OO    OO XXX  XXX YYY   YY  GG GG     EE         NN      **
-**   OO    OO  XXXXXX   YYYYYY   GG   GG   EEEEEE     NN      **
-**   OO    OO    XX      YYYY    GG    GG  EEEEEE     NN      **
-**                                                            **
-****************************************************************
- **************************************************************
-"""
-        self.assertEquals(actual, expected)
-        # Trick: hockey is consist of letters of oxygen
-        origin_url = "".join([self.prefix, "oxygen", self.suffix])
-        try:
-            r = requests.get(origin_url)
-        except:
-            raise
-        self.assertTrue(r.ok)
-        next_entry = [
-            re.sub(r"(.*)URL=(.*)\.html\"\>", r"\2", line)
-            for line in r.iter_lines()
-            if re.match(r".*URL.*", line)
-        ]
-        r.close()
-        if len(next_entry) != 0:
-            r = requests.get("".join([self.prefix, next_entry[0], self.suffix]))
-            logging.warn("Level 07 is %s" % r.url)
-        else:
-            logging.warn("Level 07 is %s" % origin_url)
-
-
-if __name__ == "__main__":
-    unittest.main(failfast=True)
+    return total_comments  # hockey

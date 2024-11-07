@@ -9,7 +9,7 @@ import requests
 
 # [2024-11-02T23:57:45+08:00] The entire walkthrough will cost at least 1 min
 # (averagely 79.79s if using aiohttp, slower if using requests). Based on the
-# latest testing result, it will stop after connecting 250 times.
+# latest testing result, it will stop after bouncing 250 times.
 async def trampoline_fetch():
     url = "http://www.pythonchallenge.com/pc/def/linkedlist.php"
     n = "12345"

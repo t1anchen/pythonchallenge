@@ -32,7 +32,7 @@ async def trampoline_fetch():
             elif re.search("html", resp_text):
                 # end case
                 n = re.sub(r"(.+)\.html", r"\1", resp_text)
-            logging.debug(f"{n_jump=} {resp_text=} {n=}")
+            # logging.debug(f"{n_jump=} {resp_text=} {n=}")
             n_jump += 1
     return n
 

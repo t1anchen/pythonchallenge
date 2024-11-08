@@ -1,9 +1,6 @@
 import logging
-import os
-import os.path
 import re
 import unittest
-import urllib
 
 import requests
 import urllib2

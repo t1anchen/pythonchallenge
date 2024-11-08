@@ -1,16 +1,13 @@
-import bz2
-import logging
-import os
-import os.path
-import re
-import unittest
 import asyncio
+import bz2
+import re
+from typing import Optional, Tuple
+from urllib.parse import urljoin, urlsplit
+
 import aiohttp
 from bs4 import BeautifulSoup
 
-from typing import Tuple, Optional
 from . import def_page_template, pc_return_tmpl
-from urllib.parse import urljoin, urlsplit
 
 
 def str2bytes(s) -> bytes:
@@ -49,6 +46,7 @@ def solution(data: Optional[Tuple[bytes, bytes, str]]):
         data = asyncio.run(fetch_from_remote())
     un, pw, hint = data
     return (bz2.decompress(un).decode(), bz2.decompress(pw).decode(), hint)
+    # "huge", "file", "/pc/return/good.html"
 
 
 # class SolutionTest(unittest.TestCase):

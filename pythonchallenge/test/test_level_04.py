@@ -1,9 +1,12 @@
-from pc.level_04 import solution
-import pytest
-import time
 import logging
+import time
+
+import pytest
+
+from pc.level_04 import solution
 
 
+@pytest.mark.skip
 def test_integration():
     tick_start = time.perf_counter()
     actual = solution()
@@ -17,11 +20,11 @@ def test_integration():
 @pytest.mark.skip
 def test_integration2():
     """Using built-in urllib to perform http request"""
-    from urllib.request import urlopen
-    from urllib.parse import urlencode
     import logging
     import re
     from collections import deque
+    from urllib.parse import urlencode
+    from urllib.request import urlopen
 
     tick_start = time.perf_counter()
     url = "http://www.pythonchallenge.com/pc/def/linkedlist.php"

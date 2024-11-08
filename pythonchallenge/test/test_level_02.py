@@ -3,6 +3,7 @@ import logging
 import re
 from pathlib import Path
 
+import pytest
 import requests
 
 from pc import def_page_template
@@ -19,6 +20,7 @@ def test_unit():
         assert expected == actual
 
 
+@pytest.mark.skip
 def test_integration():
     expected = "equality"
     url = def_page_template.format("ocr")

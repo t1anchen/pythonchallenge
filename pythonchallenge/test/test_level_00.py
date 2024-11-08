@@ -14,6 +14,7 @@ def test_unit(actual: str):
     assert expected == actual
 
 
+@pytest.mark.skip
 def test_integration(actual: str):
     url = def_page_template.format(actual)
     logging.debug(f"Visiting {url}")

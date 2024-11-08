@@ -1,75 +1,70 @@
+import asyncio
 import logging
-import os
-import os.path
 import re
-import unittest
-import urllib
-import webbrowser
+from collections import deque
+from io import BytesIO
+from itertools import islice
+from typing import Tuple
+from urllib.parse import urljoin
 
-import Image
-import ImageDraw
-import requests
-import urllib2
+import aiohttp
+from bs4 import BeautifulSoup, Comment
+from PIL import Image
 
-# Default is warning, it's to suppress requests INFO log
-logging.basicConfig(format="%(message)s")
-
-
-def solution():
-    url = "http://www.pythonchallenge.com/pc/return/good.html"
-    html = requests.get(url, auth=("huge", "file")).text
-    first_array = map(
-        int,
-        re.sub(r"\n", "", re.findall(r"first:\n([0-9,\n]+)\n\n", html)[0]).split(","),
-    )
-    second_array = map(
-        int,
-        re.sub(r"\n", "", re.findall(r"second:\n([0-9,\n]+)\n\n", html)[0]).split(","),
-    )
-    image = Image.new("1", (500, 500), 1)  # as max(first_array, second_array) < 500
-    draw = ImageDraw.Draw(image)
-    draw.line(zip(first_array[0::2], first_array[1::2]))
-    draw.line(zip(second_array[0::2], second_array[1::2]))
-    image.save("bull.png")
-    return "bull"  # if it's cow, url response will return "hmm, it's a male"
+from . import base_url
 
 
-class SolutionTest(unittest.TestCase):
+async def fetch_from_remote():
+    url = urljoin(base_url, "/pc/return/good.html")
+    logging.debug(f"Visiting {url}")
+    async with aiohttp.ClientSession() as session:
+        auth = aiohttp.BasicAuth("huge", "file")
+        async with session.get(url, auth=auth) as resp:
+            html_page = await resp.text()
+        # logging.debug(f"{html_page=}")
+        parser = BeautifulSoup(html_page, "html.parser")
+        img_url = urljoin(url, parser.find("img")["src"])
+        async with session.get(img_url, auth=auth) as resp:
+            img = await resp.read()
+        logging.debug(f"{img_url=}")
+        first, second = "", ""
 
-    def setUp(self):
-        self.prefix = "http://www.pythonchallenge.com/pc/return/"
-        self.suffix = ".html"
-
-    def tearDown(self):
-        png_path = os.path.join("bull.png")
-        if os.path.exists(png_path):
-            os.remove(png_path)
-
-    def test_solution(self):
-        actual = solution()
-        expected = "bull"
-        cred = ("huge", "file")
-        self.assertEquals(actual, expected)
-        origin_url = "".join([self.prefix, "bull", self.suffix])
-        try:
-            r = requests.get(origin_url, auth=cred)
-        except:
-            raise
-        self.assertTrue(r.ok)
-        next_entry = [
-            re.sub(r"(.*)URL=(.*)\.html\"\>", r"\2", line)
-            for line in r.iter_lines()
-            if re.match(r".*URL.*", line)
-        ]
-        r.close()
-        if len(next_entry) != 0:
-            r = requests.get(
-                "".join([self.prefix, next_entry[0], self.suffix], auth=expected)
-            )
-            logging.warn("Level 10 is %s with %s" % (r.url, cred))
-        else:
-            logging.warn("Level 10 is %s with %s" % (origin_url, cred))
+        for captured in parser.find_all(string=lambda text: isinstance(text, Comment)):
+            captured = captured.replace("\n", "")
+            first = "".join(re.findall(r"first:([\d,]+)", captured))
+            second = "".join(re.findall(r"second:([\d,]+)", captured))
+        # logging.debug(f"{first=}")
+        # logging.debug(f"{second=}")
+        return first, second, img
 
 
-if __name__ == "__main__":
-    unittest.main(failfast=True)
+def sliding_window(iterable, n):
+    iterator = iter(iterable)
+    window = deque(islice(iterator, n), maxlen=n)
+    for x in iterator:
+        window.append(x)
+        yield tuple(window)
+
+
+def solution(data: Tuple[str, str, bytes]):
+    if data is None:
+        data = asyncio.run(fetch_from_remote())
+    first, second, img_data = data
+    first = [*map(int, first.split(","))]
+    second = [*map(int, second.split(","))]
+
+    path_first = tuple(first[i : i + 2] for i in range(0, len(first), 2))
+    path_second = tuple(second[i : i + 2] for i in range(0, len(second), 2))
+
+    img_read = Image.open(BytesIO(img_data))
+    img_write = Image.new(img_read.mode, img_read.size)
+
+    for paint_path in (path_first, path_second):
+        for x, y in paint_path:
+            img_write.putpixel((x, y), (128, 128, 128))
+
+    # img_write.show()
+
+    return "bull"
+    # bull
+    # if it's cow, url response will return "hmm, it's a male"

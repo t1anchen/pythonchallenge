@@ -1,69 +1,47 @@
-import logging
-import re
-import unittest
+import asyncio
+from itertools import groupby, islice
+from typing import Optional
+from urllib.parse import urljoin
 
-import requests
-import urllib2
-
-# Default is warning, it's to suppress requests INFO log
-logging.basicConfig(format="%(message)s")
+import aiohttp
+from bs4 import BeautifulSoup
 
 
-def next_seq_item(current_item):
-    last_digit = current_item[0]
-    next_item = ""
-    last_digit_count = 0
-    for digit in current_item:
-        if digit == last_digit:
-            last_digit_count += 1
-        else:
-            next_item += str(last_digit_count)
-            next_item += last_digit
-            last_digit = digit
-            last_digit_count = 1
-    next_item += str(last_digit_count)
-    next_item += last_digit
-    return next_item
+async def fetch_from_remote():
+    url = "http://www.pythonchallenge.com/pc/return/bull.html"
+    async with aiohttp.ClientSession() as session:
+        auth = aiohttp.BasicAuth("huge", "file")
+        async with session.get(url, auth=auth) as resp:
+            html_page = await resp.text()
+        parser = BeautifulSoup(html_page, "html.parser")
+        area_tag = parser.find("area")
+        assert "href" in area_tag.attrs
+        url = urljoin(url, area_tag["href"])
+        async with session.get(url, auth=auth) as resp:
+            seq_text = await resp.text()
+        return seq_text.strip()
 
 
-def solution():
-    last_item = "1"
-    for i in range(30):
-        last_item = next_seq_item(last_item)
-    return str(len(last_item))
+def look_and_say_seq():
+    """OEIS A005150
+
+    Reference
+    ---------
+
+    - http://oeis.org/A005150
+    - https://mathworld.wolfram.com/LookandSaySequence.html
+    """
+    x = "1"
+    while True:
+        yield x
+        x = "".join(str(len(list(g))) + k for k, g in groupby(x))
+        # 2.62 ms ± 42.2 μs per loop (mean ± std. dev. of 7 runs, 100 loops each)
+        # x = "".join(str(sum(1 for _ in g)) + k for k, g in groupby(x))
+        # 4.12 ms ± 29.5 μs per loop (mean ± std. dev. of 7 runs, 100 loops each)
 
 
-class SolutionTest(unittest.TestCase):
-
-    def setUp(self):
-        self.prefix = "http://www.pythonchallenge.com/pc/return/"
-        self.suffix = ".html"
-
-    def test_solution(self):
-        actual = solution()
-        expected = "5808"
-        cred = ("huge", "file")
-        self.assertEquals(actual, expected)
-        origin_url = "".join([self.prefix, "5808", self.suffix])
-        try:
-            r = requests.get(origin_url, auth=cred)
-        except:
-            raise
-        self.assertTrue(r.ok)
-        next_entry = [
-            re.sub(r"(.*)URL=(.*)\.html\"\>", r"\2", line)
-            for line in r.iter_lines()
-            if re.match(r".*URL.*", line)
-        ]
-        r.close()
-        if len(next_entry) != 0:
-            r = requests.get(
-                "".join([self.prefix, next_entry[0], self.suffix], auth=expected)
-            )
-            logging.warn("Level 11 is %s with %s" % (r.url, cred))
-        else:
-            logging.warn("Level 11 is %s with %s" % (origin_url, cred))
-
-
-if __name__ == "__main__":
-    unittest.main(failfast=True)
+def solution(data: Optional[str]):
+    if data is None:
+        data = asyncio.run(fetch_from_remote())
+    x_30 = next(islice(look_and_say_seq(), 30, None))
+    return len(x_30)

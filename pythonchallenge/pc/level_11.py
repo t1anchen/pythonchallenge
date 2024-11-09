@@ -1,66 +1,49 @@
+import asyncio
 import logging
-import os
-import os.path
-import re
-import unittest
+from io import BytesIO
+from itertools import product
+from typing import Optional
+from urllib.parse import urljoin
 
-import Image
-import ImageDraw
-import requests
-from StringIO import StringIO
+import aiohttp
+from bs4 import BeautifulSoup
+from PIL import Image
 
-# Default is warning, it's to suppress requests INFO log
-logging.basicConfig(format="%(message)s")
+from . import pc_return_page_tmpl
 
 
-def solution():
-    url = "http://www.pythonchallenge.com/pc/return/cave.jpg"
-    r = requests.get(url, auth=("huge", "file"))
-    image_file = Image.open(StringIO(r.content))
-    new_image = Image.new("RGB", (640, 480), "black")
-    new_image_stroke = ImageDraw.Draw(new_image)
-    for y in xrange(480):
-        for x in xrange(640):
-            if y % 2 == 0 and x % 2 == 0 or y % 2 == 1 and x % 2 == 1:
-                new_image.putpixel((x, y), image_file.getpixel((x, y)))
-    new_image.save("cave_edited.jpg")
-    return "evil"
+async def fetch_from_remote():
+    url = pc_return_page_tmpl.format("5808")
+    async with aiohttp.ClientSession() as session:
+        auth = aiohttp.BasicAuth("huge", "file")
+        logging.debug(f"Visitng {url}")
+        async with session.get(url, auth=auth) as resp:
+            html_page = await resp.text()
+        parser = BeautifulSoup(html_page, "html.parser")
+        img_tag = parser.find("img")
+        assert "src" in img_tag.attrs
+        img_url = urljoin(url, img_tag["src"])
+        async with session.get(img_url, auth=auth) as resp:
+            img_data = await resp.read()
+        return img_data
 
 
-class SolutionTest(unittest.TestCase):
-
-    def setUp(self):
-        self.prefix = "http://www.pythonchallenge.com/pc/return/"
-        self.suffix = ".html"
-
-    def tearDown(self):
-        os.remove("cave_edited.jpg")
-
-    def test_solution(self):
-        actual = solution()
-        expected = "evil"
-        cred = ("huge", "file")
-        self.assertEquals(actual, expected)
-        origin_url = "".join([self.prefix, "evil", self.suffix])
-        try:
-            r = requests.get(origin_url, auth=cred)
-        except:
-            raise
-        self.assertTrue(r.ok)
-        next_entry = [
-            re.sub(r"(.*)URL=(.*)\.html\"\>", r"\2", line)
-            for line in r.iter_lines()
-            if re.match(r".*URL.*", line)
-        ]
-        r.close()
-        if len(next_entry) != 0:
-            r = requests.get(
-                "".join([self.prefix, next_entry[0], self.suffix], auth=expected)
-            )
-            logging.warn("Level 12 is %s with %s" % (r.url, cred))
+def solution(data: Optional[bytes]):
+    if data is None:
+        data = asyncio.run(fetch_from_remote())
+    img_read = Image.open(BytesIO(data))
+    M, N = img_read.size
+    even = Image.new("RGB", (M // 2, N // 2))
+    odd = Image.new("RGB", (M // 2, N // 2))
+    for x, y in product(range(M), range(N)):
+        if x % 2 == 0 and y % 2 == 0:
+            even.putpixel((x >> 1, y >> 1), img_read.getpixel((x, y)))
+        elif x % 2 == 0 and y % 2 == 1:
+            odd.putpixel((x >> 1, (y - 1) >> 1), img_read.getpixel((x, y)))
+        elif x % 2 == 1 and y % 2 == 0:
+            even.putpixel(((x - 1) >> 1, y >> 1), img_read.getpixel((x, y)))
         else:
-            logging.warn("Level 12 is %s with %s" % (origin_url, cred))
-
-
-if __name__ == "__main__":
-    unittest.main(failfast=True)
+            odd.putpixel(((x - 1) >> 1, (y - 1) >> 1), img_read.getpixel((x, y)))
+    # even.show("even")
+    odd.show("odd")
+    return "evil"

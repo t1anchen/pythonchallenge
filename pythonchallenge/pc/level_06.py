@@ -6,7 +6,7 @@ from io import BytesIO
 
 import aiohttp
 
-from . import def_page_template, def_template
+from .utils import def_page_template, def_template
 
 
 async def get_hint():

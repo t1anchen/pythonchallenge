@@ -7,7 +7,7 @@ import aiohttp
 from bs4 import BeautifulSoup
 from PIL import Image
 
-from . import def_page_template, def_template
+from .utils import def_page_template, def_template
 
 
 async def fetch_from_remote():

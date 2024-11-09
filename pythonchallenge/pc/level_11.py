@@ -9,7 +9,7 @@ import aiohttp
 from bs4 import BeautifulSoup
 from PIL import Image
 
-from . import pc_return_page_tmpl
+from .utils import pc_return_page_tmpl
 
 
 async def fetch_from_remote():

@@ -6,8 +6,8 @@ from pathlib import Path
 import pytest
 import requests
 
-from pc import def_page_template
 from pc.level_02 import solution
+from pc.utils import def_page_template
 
 
 def test_unit():

@@ -7,7 +7,7 @@ from urllib.parse import urljoin, urlsplit
 import aiohttp
 from bs4 import BeautifulSoup
 
-from . import def_page_template, pc_return_tmpl
+from .utils import def_page_template, pc_return_tmpl
 
 
 def str2bytes(s) -> bytes:

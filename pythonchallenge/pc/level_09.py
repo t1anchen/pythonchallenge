@@ -11,7 +11,7 @@ import aiohttp
 from bs4 import BeautifulSoup, Comment
 from PIL import Image
 
-from . import base_url
+from .utils import base_url
 
 
 async def fetch_from_remote():

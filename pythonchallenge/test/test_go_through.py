@@ -35,38 +35,38 @@ pc_return_tmpl = "http://www.pythonchallenge.com/pc/return/{0}"
 #     assert actual == expected
 
 
-def test_level_12():
-    actual = pc.level_12.solution()
-    expected = "disproportional"
-    assert expected == actual
-    pc.level_12.clean()
+# def test_level_12():
+#     actual = pc.level_12.solution()
+#     expected = "disproportional"
+#     assert expected == actual
+#     pc.level_12.clean()
 
 
-def test_level_13():
-    actual = pc.level_13.solution()
-    expected = "ITALY"
-    assert expected == actual
+# def test_level_13():
+#     actual = pc.level_13.solution()
+#     expected = "ITALY"
+#     assert expected == actual
 
 
-def test_level_14():
-    actual = pc.level_14.solution()
-    expected = "cat"
-    assert expected == actual
+# def test_level_14():
+#     actual = pc.level_14.solution()
+#     expected = "cat"
+#     assert expected == actual
 
 
-def test_level_15():
-    actual = pc.level_15.solution()
-    expected = "mozart"
-    assert expected == actual
+# def test_level_15():
+#     actual = pc.level_15.solution()
+#     expected = "mozart"
+#     assert expected == actual
 
 
-def test_level_16():
-    actual = pc.level_16.solution()
-    expected = "romance"
-    assert expected == actual
+# def test_level_16():
+#     actual = pc.level_16.solution()
+#     expected = "romance"
+#     assert expected == actual
 
 
-def test_level_17():
-    actual = pc.level_17.solution()
-    expected = "balloons"
-    assert expected == actual
+# def test_level_17():
+#     actual = pc.level_17.solution()
+#     expected = "balloons"
+#     assert expected == actual

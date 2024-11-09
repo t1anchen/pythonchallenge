@@ -3,8 +3,8 @@ import logging
 import pytest
 import requests
 
-from pc import def_page_template
 from pc.level_00 import solution
+from pc.utils import def_page_template
 
 actual = pytest.fixture(solution)
 

@@ -33,6 +33,15 @@ async def fetch_from_remote():
         evil2_gfx_url = urljoin(url, "evil2.gfx")
         evil2_gfx = await fetch_bytes(evil2_gfx_url, session, auth)
         logging.debug(f"{len(evil2_gfx)=}")
+        evil3_url = urljoin(url, "evil3.jpg")
+        img_data = await fetch_bytes(evil3_url, session, auth)
+        evil3 = Image.open(BytesIO(img_data))
+        # evil3.show() # no more evils
+
+        # [2024-11-10T00:20:36+08:00] it looks like
+        # http://www.pythonchallenge.com/pc/return/evil4.jpg shows error, but
+        # this jpg contains important hints for Level 13. It prompted "Bert is
+        # evil".
     return evil2_gfx
 
 

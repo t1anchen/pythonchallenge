@@ -50,3 +50,18 @@ async def fetch_first_img(
     async with session.get(img_url, auth=auth) as resp:
         img_data = await resp.read()
     return img_data
+
+
+async def fetch_first_link_in_area(
+    url: str,
+    session: aiohttp.ClientSession,
+    auth: Optional[aiohttp.BasicAuth] = None,
+) -> str:
+    logging.debug(f"Visitng {url}")
+    async with session.get(url, auth=auth) as resp:
+        html_page = await resp.text()
+    parser = BeautifulSoup(html_page, "html.parser")
+    area_tag = parser.find("area")
+    assert "href" in area_tag.attrs
+    url = urljoin(url, area_tag["href"])
+    return url

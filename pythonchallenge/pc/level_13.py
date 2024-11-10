@@ -20,9 +20,14 @@ async def fetch_from_remote():
 # [2024-11-09T23:55:41+08:00] From code of xmlrpc/client.py, it is found that
 # accept_gzip_encoding is hard coded in Transport.
 
-#   if self.accept_gzip_encoding and gzip:
-#       connection.putrequest("POST", handler, skip_accept_encoding=True)
-#       headers.append(("Accept-Encoding", "gzip"))
+#   class Trasport:
+#   ...
+#       accept_gzip_encoding = True
+#   ...
+#       if self.accept_gzip_encoding and gzip:
+#           connection.putrequest("POST", handler, skip_accept_encoding=True)
+#           headers.append(("Accept-Encoding", "gzip"))
+#   ...
 
 # Thus, neither overriding `request` method nor modifying `headers` can affect
 # the behaviour. The reason why it is hardcoded is unknown, but the issue can be
@@ -30,11 +35,17 @@ async def fetch_from_remote():
 # False
 
 # [2024-11-10T00:01:55+08:00] By the way, DO NOT TRUST ANY AI-GENERATED CODE.
-# THE EFFECTIVENESS OF CODE MUST BE VERIFIED BEFORE TAKING INTO REPOSITORY.
+# THE EFFECTIVENESS OF CODE MUST BE VERIFIED BEFORE TAKING INTO REALWORLD USAGE.
 
 # [2024-11-10T00:03:19+08:00] Scientific method, debugger and reading/testing
 # code is your friend rather than a stupid AI collecting any unverified
 # information (which means bias, error and misinformation) from the world.
+
+# [2024-11-10T00:30:46+08:00] It is required to override Transport class,
+# otherwise the default behaviour of xmlrpc.client enforces connection with
+# gzipped and throws "Not a gzipped file. b(\n\n)" error. Perplexity.AI provided
+# incorrect answer with false/outdated information that took me 2 hours to
+# debugging, investigating and correcting the misinformation.
 
 
 class NoGzipTransport(xmlrpc.client.Transport):
